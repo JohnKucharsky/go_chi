@@ -1,27 +1,22 @@
 package main
 
 import (
+	"context"
 	"fmt"
-	"net/http"
+	"github.com/JohnKucharsky/go_chi/application"
+	"os"
+	"os/signal"
 )
 
 func main() {
-	server := &http.Server{
-		Addr:    ":3000",
-		Handler: http.HandlerFunc(basicHandler),
-	}
+	app := application.New()
 
-	err := server.ListenAndServe()
+	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt)
+	defer cancel()
+
+	err := app.Start(ctx)
 
 	if err != nil {
 		fmt.Println(err)
 	}
-}
-
-func basicHandler(w http.ResponseWriter, r *http.Request) {
-	_, err := w.Write([]byte("Hello, world!"))
-	if err != nil {
-		return
-	}
-
 }
